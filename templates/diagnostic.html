@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnostic</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a0e1a; color: #e0e6f0; font-family: 'Segoe UI', sans-serif; padding: 40px 20px; }
+        .container { max-width: 700px; margin: 0 auto; }
+        h1 { color: #f99e1a; font-size: 24px; margin-bottom: 8px; text-align: center; }
+        .meta { text-align: center; color: #8892a4; font-size: 14px; margin-bottom: 30px; }
+        .resultat { text-align: center; padding: 16px; border-radius: 10px; font-size: 20px; font-weight: 700; margin-bottom: 30px; }
+        .victoire { background: #0d2a1a; color: #2ecc71; border: 1px solid #2ecc71; }
+        .defaite { background: #2a0d0d; color: #e74c3c; border: 1px solid #e74c3c; }
+        .diagnostic-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
+        .diagnostic-item { background: #141826; border-left: 3px solid #e74c3c; border-radius: 0 8px 8px 0; padding: 16px 20px; font-size: 14px; line-height: 1.6; }
+        .diagnostic-ok { border-left-color: #2ecc71; }
+        .actions { display: flex; gap: 12px; }
+        .btn { flex: 1; display: block; padding: 14px; border-radius: 8px; font-size: 15px; font-weight: 600; text-decoration: none; text-align: center; transition: all 0.2s; }
+        .btn-primary { background: #f99e1a; color: #0a0e1a; }
+        .btn-primary:hover { background: #ffb340; }
+        .btn-secondary { background: transparent; color: #f99e1a; border: 2px solid #f99e1a; }
+        .btn-secondary:hover { background: #f99e1a22; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Diagnostic</h1>
+        <div class="meta">{{ reponses.get('hero', '') }} · {{ reponses.get('mode', '') }} · {{ reponses.get('date', '') }}</div>
+        <div class="resultat {{ 'victoire' if reponses.get('resultat') == 'Victoire' else 'defaite' }}">
+            {{ '🏆 VICTOIRE' if reponses.get('resultat') == 'Victoire' else '💀 DÉFAITE' }}
+        </div>
+        <div class="diagnostic-list">
+            {% for d in diagnostics %}
+            <div class="diagnostic-item {{ 'diagnostic-ok' if 'Excellente' in d else '' }}">
+                {{ '✅' if 'Excellente' in d else '❌' }} {{ d }}
+            </div>
+            {% endfor %}
+        </div>
+        <div class="actions">
+            <a href="/questions" class="btn btn-primary">+ Nouvelle session</a>
+            <a href="/patterns" class="btn btn-secondary">📈 Mes patterns</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouvelle Session</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a0e1a; color: #e0e6f0; font-family: 'Segoe UI', sans-serif; padding: 40px 20px; }
+        .container { max-width: 700px; margin: 0 auto; }
+        h1 { color: #f99e1a; font-size: 24px; margin-bottom: 30px; text-align: center; }
+        .section { background: #141826; border: 1px solid #1e2a40; border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .section h2 { color: #f99e1a; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; }
+        label { display: block; color: #c0cad8; font-size: 14px; margin-bottom: 8px; }
+        select { width: 100%; padding: 10px 14px; background: #0a0e1a; border: 1px solid #2a3a54; border-radius: 8px; color: #e0e6f0; font-size: 14px; margin-bottom: 16px; }
+        .question { margin-bottom: 20px; border-bottom: 1px solid #1e2a40; padding-bottom: 20px; }
+        .question:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .question p { font-size: 15px; color: #e0e6f0; margin-bottom: 12px; }
+        .options { display: flex; gap: 10px; flex-wrap: wrap; }
+        .options input[type="radio"] { display: none; }
+        .options label { background: #0a0e1a; border: 1px solid #2a3a54; border-radius: 6px; padding: 8px 16px; cursor: pointer; font-size: 13px; color: #8892a4; transition: all 0.2s; margin: 0; }
+        .options input[type="radio"]:checked + label { background: #f99e1a22; border-color: #f99e1a; color: #f99e1a; font-weight: 600; }
+        .options label:hover { border-color: #f99e1a88; color: #e0e6f0; }
+        .btn { display: block; width: 100%; padding: 16px; background: #f99e1a; color: #0a0e1a; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 20px; letter-spacing: 1px; }
+        .btn:hover { background: #ffb340; }
+        .cat-title { color: #f99e1a; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; margin: 24px 0 12px; opacity: 0.7; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Nouvelle Session</h1>
+        <form method="POST">
+            <div class="section">
+                <h2>Infos de la partie</h2>
+                <label>Héros joué</label>
+                <select name="hero" required>
+                    {% for hero in heroes %}
+                    <option value="{{ hero }}">{{ hero }}</option>
+                    {% endfor %}
+                </select>
+                <label>Mode de jeu</label>
+                <select name="mode" required>
+                    {% for mode in modes %}
+                    <option value="{{ mode }}">{{ mode }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="section">
+                <h2>Questions</h2>
+                {% set categories = namespace(current="") %}
+                {% for cle, question, reponses in questions %}
+                    {% set cat = question.split("—")[0].strip() if "—" in question else "" %}
+                    {% if cat != categories.current %}
+                        {% set categories.current = cat %}
+                        <p class="cat-title">{{ cat }}</p>
+                    {% endif %}
+                    <div class="question">
+                        <p>{{ question.split("—")[1].strip() if "—" in question else question }}</p>
+                        <div class="options">
+                            {% for rep in reponses %}
+                            <input type="radio" name="{{ cle }}" id="{{ cle }}_{{ loop.index }}" value="{{ rep }}" required>
+                            <label for="{{ cle }}_{{ loop.index }}">{{ rep }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <button type="submit" class="btn">ANALYSER MA PARTIE →</button>
+        </form>
+    </div>
+</body>
+</html>
