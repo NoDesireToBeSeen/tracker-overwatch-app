@@ -3,70 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mes Patterns</title>
+    <title>Progression</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #0a0e1a; color: #e0e6f0; font-family: 'Segoe UI', sans-serif; padding: 40px 20px; }
         .container { max-width: 700px; margin: 0 auto; }
-        h1 { color: #f99e1a; font-size: 24px; margin-bottom: 30px; text-align: center; }
-        .section { background: #141826; border: 1px solid #1e2a40; border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        h1 { color: #f99e1a; font-size: 24px; }
+        .back { color: #8892a4; font-size: 13px; text-decoration: none; }
+        .back:hover { color: #f99e1a; }
+        .section { background: #141826; border: 1px solid #1e2a40; border-radius: 12px; padding: 24px; margin-bottom: 16px; }
         .section h2 { color: #f99e1a; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; }
         .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #1e2a40; }
         .stat-row:last-child { border-bottom: none; }
         .stat-label { color: #8892a4; font-size: 14px; }
-        .stat-value { font-weight: 700; font-size: 16px; color: #e0e6f0; }
+        .stat-value { font-weight: 700; font-size: 15px; }
         .winrate-bar { height: 6px; background: #1e2a40; border-radius: 3px; margin-top: 6px; }
         .winrate-fill { height: 100%; border-radius: 3px; background: #f99e1a; }
-        .erreur-item { padding: 12px 0; border-bottom: 1px solid #1e2a40; font-size: 14px; line-height: 1.5; }
+        .erreur-item { padding: 10px 0; border-bottom: 1px solid #1e2a40; font-size: 13px; line-height: 1.5; }
         .erreur-item:last-child { border-bottom: none; }
-        .erreur-count { display: inline-block; background: #f99e1a22; color: #f99e1a; border-radius: 4px; padding: 2px 8px; font-size: 12px; font-weight: 700; margin-right: 8px; }
-        .btn { display: block; text-align: center; padding: 14px; background: #f99e1a; color: #0a0e1a; border-radius: 8px; font-weight: 700; text-decoration: none; margin-top: 20px; }
-        .btn:hover { background: #ffb340; }
-        .vide { text-align: center; color: #8892a4; padding: 40px; }
+        .erreur-count { display: inline-block; background: #f99e1a22; color: #f99e1a; border-radius: 4px; padding: 1px 6px; font-size: 11px; font-weight: 700; margin-right: 6px; }
+        .chart-container { position: relative; height: 200px; }
+        .empty { color: #8892a4; text-align: center; padding: 20px; font-size: 14px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>📈 Mes Patterns</h1>
-        {% if vide %}
-        <div class="vide">
-            <p style="font-size:48px;margin-bottom:16px">🎮</p>
-            <p>Aucune session enregistrée pour l'instant.</p>
-            <a href="/questions" class="btn" style="margin-top:20px">+ Commencer maintenant</a>
+        <div class="header">
+            <h1>📈 Progression de {{ pseudo }}</h1>
+            <a href="/dashboard" class="back">← Dashboard</a>
         </div>
-        {% else %}
+
+        {% if stats %}
+
         <div class="section">
             <h2>Vue globale</h2>
-            <div class="stat-row"><span class="stat-label">Sessions totales</span><span class="stat-value">{{ total }}</span></div>
-            <div class="stat-row"><span class="stat-label">Victoires</span><span class="stat-value" style="color:#2ecc71">{{ victoires }}</span></div>
-            <div class="stat-row"><span class="stat-label">Défaites</span><span class="stat-value" style="color:#e74c3c">{{ total - victoires }}</span></div>
+            <div class="stat-row">
+                <span class="stat-label">Sessions totales</span>
+                <span class="stat-value">{{ stats.total }}</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Victoires</span>
+                <span class="stat-value" style="color:#2ecc71">{{ stats.victoires }}</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Défaites</span>
+                <span class="stat-value" style="color:#e74c3c">{{ stats.total - stats.victoires }}</span>
+            </div>
             <div class="stat-row">
                 <span class="stat-label">Winrate global</span>
-                <span class="stat-value">{{ winrate }}%</span>
+                <span class="stat-value" style="color:#f99e1a">{{ stats.winrate }}%</span>
             </div>
-            <div class="winrate-bar"><div class="winrate-fill" style="width:{{ winrate }}%"></div></div>
+            <div class="winrate-bar">
+                <div class="winrate-fill" style="width:{{ stats.winrate }}%"></div>
+            </div>
         </div>
+
+        {% if stats.progression|length > 1 %}
+        <div class="section">
+            <h2>Winrate dans le temps</h2>
+            <div class="chart-container">
+                <canvas id="progressionChart"></canvas>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if stats.stats_heroes %}
         <div class="section">
             <h2>Stats par héros</h2>
-            {% for hero, stats in stats_heroes.items() | sort(attribute='1.total', reverse=True) %}
-            {% if loop.index <= 5 %}
+            {% for hero, s in stats.stats_heroes.items()|sort(attribute='1.total', reverse=True) %}
+            {% if loop.index <= 8 %}
             <div class="stat-row">
-                <span class="stat-label">{{ hero }} ({{ stats.total }} parties)</span>
-                <span class="stat-value">{{ stats.winrate }}%</span>
+                <div>
+                    <span class="stat-label">{{ hero }}</span>
+                    <span style="color:#555;font-size:12px;margin-left:6px">{{ s.total }} partie(s)</span>
+                </div>
+                <span class="stat-value" style="color:{{ '#2ecc71' if s.winrate >= 50 else '#e74c3c' }}">{{ s.winrate }}%</span>
             </div>
             {% endif %}
             {% endfor %}
         </div>
+        {% endif %}
+
+        {% if stats.top_erreurs %}
         <div class="section">
-            <h2>Tes erreurs récurrentes</h2>
-            {% for erreur, nb in top_erreurs %}
+            <h2>Tes 5 erreurs les plus fréquentes</h2>
+            {% for erreur, nb in stats.top_erreurs %}
             <div class="erreur-item">
                 <span class="erreur-count">{{ nb }}x</span>{{ erreur }}
             </div>
             {% endfor %}
         </div>
-        <a href="/" class="btn">← Retour à l'accueil</a>
+        {% endif %}
+
+        {% else %}
+        <div class="section">
+            <div class="empty">Lance ta première session pour voir ta progression ici !</div>
+        </div>
         {% endif %}
     </div>
+
+    {% if stats and stats.progression|length > 1 %}
+    <script>
+        const data = {{ stats.progression | tojson }};
+        const ctx = document.getElementById('progressionChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.map(d => d.date),
+                datasets: [{
+                    label: 'Winrate (%)',
+                    data: data.map(d => d.winrate),
+                    borderColor: '#f99e1a',
+                    backgroundColor: '#f99e1a22',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#f99e1a',
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        min: 0, max: 100,
+                        grid: { color: '#1e2a40' },
+                        ticks: { color: '#8892a4', callback: v => v + '%' }
+                    },
+                    x: {
+                        grid: { color: '#1e2a40' },
+                        ticks: { color: '#8892a4' }
+                    }
+                }
+            }
+        });
+    </script>
+    {% endif %}
 </body>
 </html>
