@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a0e1a; color: #e0e6f0; font-family: 'Segoe UI', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .container { width: 100%; max-width: 420px; }
+        h1 { color: #f99e1a; font-size: 24px; text-align: center; margin-bottom: 8px; }
+        .subtitle { color: #8892a4; font-size: 14px; text-align: center; margin-bottom: 30px; }
+        .card { background: #141826; border: 1px solid #1e2a40; border-radius: 12px; padding: 30px; }
+        .tabs { display: flex; gap: 0; margin-bottom: 24px; background: #0a0e1a; border-radius: 8px; padding: 4px; }
+        .tab { flex: 1; padding: 10px; text-align: center; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; color: #8892a4; border: none; background: transparent; }
+        .tab.active { background: #f99e1a; color: #0a0e1a; }
+        .field { margin-bottom: 16px; }
+        label { display: block; color: #8892a4; font-size: 13px; margin-bottom: 6px; }
+        input { width: 100%; padding: 12px 14px; background: #0a0e1a; border: 1px solid #2a3a54; border-radius: 8px; color: #e0e6f0; font-size: 14px; }
+        input:focus { outline: none; border-color: #f99e1a; }
+        .btn { width: 100%; padding: 14px; background: #f99e1a; color: #0a0e1a; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 8px; }
+        .btn:hover { background: #ffb340; }
+        .erreur { background: #2a0d0d; border: 1px solid #e74c3c; color: #e74c3c; border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 16px; }
+        .back { display: block; text-align: center; color: #8892a4; font-size: 13px; text-decoration: none; margin-top: 16px; }
+        .back:hover { color: #f99e1a; }
+        .form-connexion { display: none; }
+        .form-creer { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Tracker Overwatch</h1>
+        <p class="subtitle">Connecte-toi ou crée ton profil</p>
+        <div class="card">
+            {% if erreur %}
+            <div class="erreur">{{ erreur }}</div>
+            {% endif %}
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('creer')">Créer un profil</button>
+                <button class="tab" onclick="showTab('connexion')">Se connecter</button>
+            </div>
+            <form method="POST" id="form-creer" class="form-creer">
+                <input type="hidden" name="action" value="creer">
+                <div class="field">
+                    <label>Pseudo</label>
+                    <input type="text" name="pseudo" placeholder="Ton pseudo Overwatch" required>
+                </div>
+                <div class="field">
+                    <label>Mot de passe</label>
+                    <input type="password" name="password" placeholder="Choisis un mot de passe" required>
+                </div>
+                <button type="submit" class="btn">CRÉER MON PROFIL</button>
+            </form>
+            <form method="POST" id="form-connexion" class="form-connexion">
+                <input type="hidden" name="action" value="connexion">
+                <div class="field">
+                    <label>Pseudo</label>
+                    <input type="text" name="pseudo" placeholder="Ton pseudo" required>
+                </div>
+                <div class="field">
+                    <label>Mot de passe</label>
+                    <input type="password" name="password" placeholder="Ton mot de passe" required>
+                </div>
+                <button type="submit" class="btn">SE CONNECTER</button>
+            </form>
+        </div>
+        <a href="/" class="back">← Retour à l'accueil</a>
+    </div>
+    <script>
+        function showTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('form-creer').style.display = tab === 'creer' ? 'block' : 'none';
+            document.getElementById('form-connexion').style.display = tab === 'connexion' ? 'block' : 'none';
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

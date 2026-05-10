@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Questions {{ hero }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a0e1a; color: #e0e6f0; font-family: 'Segoe UI', sans-serif; padding: 40px 20px; }
+        .container { max-width: 700px; margin: 0 auto; }
+        .progress { background: #1e2a40; border-radius: 4px; height: 6px; margin-bottom: 30px; }
+        .progress-fill { background: #f99e1a; height: 100%; border-radius: 4px; width: {{ (index / total * 100)|int }}%; }
+        .hero-header { text-align: center; margin-bottom: 30px; }
+        .hero-name { color: #f99e1a; font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+        .hero-meta { color: #8892a4; font-size: 13px; }
+        .hero-meta span { background: #1e2a40; border-radius: 4px; padding: 2px 8px; margin: 0 4px; }
+        .section { background: #141826; border: 1px solid #1e2a40; border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .section h2 { color: #f99e1a; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; }
+        .question { margin-bottom: 20px; border-bottom: 1px solid #1e2a40; padding-bottom: 20px; }
+        .question:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .question p { font-size: 15px; color: #e0e6f0; margin-bottom: 12px; }
+        .options { display: flex; gap: 10px; flex-wrap: wrap; }
+        .options input[type="radio"] { display: none; }
+        .options label { background: #0a0e1a; border: 1px solid #2a3a54; border-radius: 6px; padding: 8px 16px; cursor: pointer; font-size: 13px; color: #8892a4; transition: all 0.2s; }
+        .options input[type="radio"]:checked + label { background: #f99e1a22; border-color: #f99e1a; color: #f99e1a; font-weight: 600; }
+        .options label:hover { border-color: #f99e1a88; color: #e0e6f0; }
+        .btn { display: block; width: 100%; padding: 16px; background: #f99e1a; color: #0a0e1a; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 20px; }
+        .btn:hover { background: #ffb340; }
+        .counter { text-align: center; color: #8892a4; font-size: 13px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="progress"><div class="progress-fill"></div></div>
+        <div class="hero-header">
+            <div class="hero-name">{{ hero }}</div>
+            <div class="hero-meta">
+                <span>{{ role }}</span>
+                <span>{{ spec }}</span>
+            </div>
+        </div>
+        <p class="counter">Héros {{ index }} sur {{ total }}</p>
+        <form method="POST">
+            <div class="section">
+                <h2>Questions spécifiques à {{ hero }}</h2>
+                {% for cle, question, reponses in questions %}
+                <div class="question">
+                    <p>👉 {{ question }}</p>
+                    <div class="options">
+                        {% for rep in reponses %}
+                        <input type="radio" name="{{ cle }}" id="{{ cle }}_{{ loop.index }}" value="{{ rep }}" required>
+                        <label for="{{ cle }}_{{ loop.index }}">{{ rep }}</label>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <button type="submit" class="btn">
+                {% if index < total %}HÉROS SUIVANT →{% else %}VOIR MON DIAGNOSTIC →{% endif %}
+            </button>
+        </form>
+    </div>
+</body>
+</html>

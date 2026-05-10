@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a0e1a; color: #e0e6f0; font-family: 'Segoe UI', sans-serif; padding: 40px 20px; }
+        .container { max-width: 700px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .welcome { font-size: 22px; font-weight: 700; color: #f99e1a; }
+        .welcome small { display: block; color: #8892a4; font-size: 13px; font-weight: 400; }
+        .logout { color: #8892a4; font-size: 13px; text-decoration: none; }
+        .logout:hover { color: #e74c3c; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+        .stat-card { background: #141826; border: 1px solid #1e2a40; border-radius: 12px; padding: 20px; text-align: center; }
+        .stat-value { font-size: 32px; font-weight: 700; color: #f99e1a; }
+        .stat-label { color: #8892a4; font-size: 12px; margin-top: 4px; }
+        .actions { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+        .btn { display: block; padding: 16px 24px; border-radius: 10px; font-size: 15px; font-weight: 600; text-decoration: none; text-align: center; transition: all 0.2s; }
+        .btn-primary { background: #f99e1a; color: #0a0e1a; }
+        .btn-primary:hover { background: #ffb340; }
+        .btn-secondary { background: #141826; color: #f99e1a; border: 2px solid #f99e1a; }
+        .btn-secondary:hover { background: #f99e1a22; }
+        .section { background: #141826; border: 1px solid #1e2a40; border-radius: 12px; padding: 24px; margin-bottom: 16px; }
+        .section h2 { color: #f99e1a; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; }
+        .erreur-item { padding: 10px 0; border-bottom: 1px solid #1e2a40; font-size: 13px; color: #c0cad8; line-height: 1.5; }
+        .erreur-item:last-child { border-bottom: none; }
+        .erreur-count { display: inline-block; background: #f99e1a22; color: #f99e1a; border-radius: 4px; padding: 1px 6px; font-size: 11px; font-weight: 700; margin-right: 6px; }
+        .empty { color: #8892a4; font-size: 14px; text-align: center; padding: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="welcome">
+                {{ pseudo }}
+                <small>Tableau de bord</small>
+            </div>
+            <a href="/deconnexion" class="logout">Déconnexion</a>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">{{ nb_sessions }}</div>
+                <div class="stat-label">Sessions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.winrate if stats else 0 }}%</div>
+                <div class="stat-label">Winrate</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.victoires if stats else 0 }}</div>
+                <div class="stat-label">Victoires</div>
+            </div>
+        </div>
+        <div class="actions">
+            <a href="/questions" class="btn btn-primary">🎮 Nouvelle session</a>
+            <a href="/progression" class="btn btn-secondary">📈 Voir ma progression</a>
+        </div>
+        {% if stats and stats.top_erreurs %}
+        <div class="section">
+            <h2>Tes erreurs récurrentes</h2>
+            {% for erreur, nb in stats.top_erreurs %}
+            <div class="erreur-item">
+                <span class="erreur-count">{{ nb }}x</span>{{ erreur }}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="section">
+            <div class="empty">Lance ta première session pour voir tes stats ici !</div>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
